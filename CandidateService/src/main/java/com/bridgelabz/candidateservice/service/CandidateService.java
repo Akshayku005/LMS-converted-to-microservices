@@ -61,7 +61,6 @@ public class CandidateService implements ICandidateService {
                 Object bankInfoList = restTemplate.getForObject("http://localhost:9010/bankinfo/get/" + i, Object.class);
                 combinedResponseDTO.setBankInfoList(bankInfoList);
                 combinedResponseDTOList.add(combinedResponseDTO);
-
             }
         return combinedResponseDTOList;
     }
@@ -76,11 +75,9 @@ public class CandidateService implements ICandidateService {
             //        get Qualification details
             Object qualificationInfoList = restTemplate.getForObject("http://localhost:9011/qualification/getby/" + id, Object.class);
             combinedResponseDTO.setQualificationInfoList(qualificationInfoList);
-            System.out.println("Qualification details" + qualificationInfoList);
 //        get BankInfo details
             Object bankInfoList = restTemplate.getForObject("http://localhost:9010/bankinfo/get/" + id, Object.class);
             combinedResponseDTO.setBankInfoList(bankInfoList);
-            System.out.println("Bankinfo details" + bankInfoList);
             return combinedResponseDTO;
         } else
             throw new CandidateException(HttpStatus.NOT_FOUND, "Candidate with this Id not found!");
@@ -133,12 +130,34 @@ public class CandidateService implements ICandidateService {
     }
 
     @Override
-    public List<Candidate> hiredCondidate(String status) {
+    public List<CombinedResponseDTO> hiredCondidate(String status) {
         List<Candidate> candidate = candidateRepository.findCandidateByStatus(status);
+        List<CombinedResponseDTO> combinedResponseDTOList = new ArrayList<>();
         if (candidate.isEmpty()) {
             throw new CandidateException(HttpStatus.NOT_FOUND, "There are no candidate got hired yet!!");
         }
-        return candidate;
+        //1234
+        List<Long> ids = new ArrayList<>();
+        for (Candidate candidateId : candidate) {
+            long id = candidateId.getId();
+            ids.add(id);
+        }
+        for (long id : ids) {
+//        for (long i = 1; i <= ids.size(); i++) {
+            CombinedResponseDTO combinedResponseDTO = new CombinedResponseDTO();
+            //        get Candidate details first
+            Object candidateInfo = restTemplate.getForObject("http://localhost:9012/candidateDetails/get/" + id, Object.class);
+            combinedResponseDTO.setCandidate(candidateInfo);
+            //        get Qualification details
+            Object qualificationInfoList = restTemplate.getForObject("http://localhost:9011/qualification/getby/" + id, Object.class);
+            combinedResponseDTO.setQualificationInfoList(qualificationInfoList);
+            //        get BankInfo details
+            Object bankInfoList = restTemplate.getForObject("http://localhost:9010/bankinfo/get/" + id, Object.class);
+            combinedResponseDTO.setBankInfoList(bankInfoList);
+            combinedResponseDTOList.add(combinedResponseDTO);
+
+        }
+        return combinedResponseDTOList;
     }
 
 

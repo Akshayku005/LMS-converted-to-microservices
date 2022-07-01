@@ -19,7 +19,7 @@ public interface ICandidateService {
 
     Candidate updateRecordByToken(String token, CandidateDTO candidateDTO);
 
-    List<Candidate> hiredCondidate(String status);
+    List<CombinedResponseDTO> hiredCondidate(String status);
     long count1(String status);
 
     long count();
